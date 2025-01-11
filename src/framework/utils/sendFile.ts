@@ -5,7 +5,9 @@ mime
 
 const sendFile = (filePath: string, res: http.ServerResponse )=>{
     const readable = fs.createReadStream(filePath)
+    res.setHeader('Content-Type', (mime as any).getType(filePath))
     readable.pipe(res)
+
 }
 
 export default sendFile

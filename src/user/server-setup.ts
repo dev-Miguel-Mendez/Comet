@@ -4,7 +4,7 @@ import http from "node:http";
 console.clear()
 
 const __dirname = import.meta.dirname
-__dirname
+
 
 const server = new Comet();
 
@@ -17,7 +17,7 @@ server.post('/postpath', (_req: http.IncomingMessage, res: http.ServerResponse)=
 	res.end('Post path!')
 })
 
-server.get('/index', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
+server.get('/', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
 	(res as any).sendFile(__dirname + '/public/index.html')
 })
 
@@ -29,19 +29,6 @@ server.get('/index.js', (_req: http.IncomingMessage, res: http.ServerResponse)=>
 	(res as any).sendFile(__dirname + '/public/index.js')
 })
  
-server.listen(3000, () => {
-	console.log("server is up on port 3000");
-});
-
-// comet.get("/test", (req: any, res: any) => {
-// 	req;
-// 	res.end("Hello back");
-// });
-
-// comet.get("/second", (req: any, res: any) => {
-// 	res.end("Test 2");
-// 	req;
-// });
 
 process.stdin.on('data', (data)=>{
 	const str = data.toString().trim()
@@ -49,3 +36,7 @@ process.stdin.on('data', (data)=>{
 		console.log(server.routes)
 	}
 })
+
+//! We are listening in another file so that we could also test in its um file.
+
+export default server

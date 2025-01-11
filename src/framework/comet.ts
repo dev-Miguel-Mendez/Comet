@@ -2,13 +2,12 @@ import http from "node:http";
 import sendFile from "./utils/sendFile.js";
 
 class Comet {
-    sever: http.Server;
+    server: http.Server;
     routes: { [key: string]: { [key: string]: Function } } = {};
 
     constructor(){
-        this.sever = http.createServer((req, res)=>{
-            console.log(req.url)
-            console.log(req.method)
+        this.server = http.createServer((req, res)=>{
+            
             const method = req.method || 'GET'
             const path = req.url || '/'
             const handler: Function = this.routes[method.toUpperCase()]?.[path.toLowerCase()]
@@ -33,8 +32,9 @@ class Comet {
         this.routes.POST[path] = cb
     }
 
+
     listen(PORT: number, cb: Function){
-        this.sever.listen(PORT, ()=>{
+        this.server.listen(PORT, ()=>{
             cb()
         })
     }
