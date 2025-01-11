@@ -8,6 +8,8 @@ const __dirname = import.meta.dirname
 
 const server = new Comet();
 
+server.setStaticDir(__dirname + '/public')
+
 server.get('/somepath', (req: http.IncomingMessage, res: http.ServerResponse)=>{
 	req; 
 	res.end('Hello there')
@@ -38,5 +40,7 @@ process.stdin.on('data', (data)=>{
 })
 
 //! We are listening in another file so that we could also test in its um file.
+
+console.log(server.staticDir)
 
 export default server
