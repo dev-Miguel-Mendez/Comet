@@ -20,15 +20,15 @@ server.post('/postpath', (_req: http.IncomingMessage, res: http.ServerResponse)=
 })
 
 server.get('/', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
-	(res as any).sendFile(__dirname + '/public/index.html')
+	(res as any).sendFile('index.html')
 })
 
 server.get('/styles.css', (_req: http.IncomingMessage, res: http.ServerResponse)=>{ 
-	(res as any).sendFile(__dirname + '/public/styles.css')
+	(res as any).sendFile('styles.css')
 })
 
 server.get('/index.js', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
-	(res as any).sendFile(__dirname + '/public/index.js')
+	(res as any).sendFile('index.js')
 })
  
 

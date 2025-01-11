@@ -15,7 +15,7 @@ class Comet {
 			if (handler) {
 				//$ Here we mess with the prototype of the res object
 				//prettier-ignore
-				(res as any).sendFile = (filePath: string) => {sendFile(filePath, res, this.staticDir);};
+				(res as any).sendFile = (fileName: string) => {sendFile(fileName, res, this.staticDir);};
 				handler(req, res);
 			} else {
 				res.statusCode = 400;
