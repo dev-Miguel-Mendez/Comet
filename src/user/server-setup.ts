@@ -11,7 +11,7 @@ const server = new Comet();
 server.setStaticDir(process.env.DIRNAME || __dirname + "/public");
 
 //prettier-ignore
-server.get('/getpath', async (req: http.IncomingMessage, res: http.ServerResponse)=>{
+server.getMiddleware('/getpath', async (req: http.IncomingMessage, res: http.ServerResponse)=>{
 	const body = await (req as any).body()
 	console.log('reqbody:', body) 
 	res.end('Hello from getpath')
@@ -19,7 +19,7 @@ server.get('/getpath', async (req: http.IncomingMessage, res: http.ServerRespons
 
 //! temp:
 //prettier-ignore
-server.post('/testparsebody', async(req: http.IncomingMessage, res: http.ServerResponse)=>{
+server.postMiddleware('/testparsebody', async(req: http.IncomingMessage, res: http.ServerResponse)=>{
 		const body = await (req as any).body()
 		if(!body){
 			res.statusCode = 400
@@ -33,11 +33,11 @@ server.post('/testparsebody', async(req: http.IncomingMessage, res: http.ServerR
 })
 
 //prettier-ignore
-server.get('/', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
+server.getMiddleware('/', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
 	(res as any).sendFile('index.html')
 })
 //prettier-ignore
-server.get('/requestnameimage', (req: http.IncomingMessage, res: http.ServerResponse)=>{
+server.getMiddleware('/requestnameimage', (req: http.IncomingMessage, res: http.ServerResponse)=>{
 	
 	let message: any
 	req.on('data', (data)=>{
@@ -50,11 +50,11 @@ server.get('/requestnameimage', (req: http.IncomingMessage, res: http.ServerResp
 	})
 })
 //prettier-ignore
-server.post('/postpath', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
+server.postMiddleware('/postpath', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
 	res.end('Hello from postpath!')
 })
 //prettier-ignore
-server.post('/upload', (req: http.IncomingMessage, res: http.ServerResponse)=>{
+server.postMiddleware('/upload', (req: http.IncomingMessage, res: http.ServerResponse)=>{
 	//! I need to implement url parameters here.
 	const writable = fs.createWriteStream(__dirname + '/public/' + req.headers['file-name'])
 	// req.pipe(writable)
@@ -67,7 +67,7 @@ server.post('/upload', (req: http.IncomingMessage, res: http.ServerResponse)=>{
 })
 
 //prettier-ignore
-server.post("/upload2", async (req: http.IncomingMessage, res: http.ServerResponse) => {
+server.postMiddleware("/upload2", async (req: http.IncomingMessage, res: http.ServerResponse) => {
 		const fileName = req.headers['file-name']
 		console.log("File name: ", fileName);
 		const result = await (req as any).saveToFile(fileName, 1e6);
@@ -82,19 +82,19 @@ server.post("/upload2", async (req: http.IncomingMessage, res: http.ServerRespon
 );
 
 //prettier-ignore
-server.get('/styles.css', (_req: http.IncomingMessage, res: http.ServerResponse)=>{ 
+server.getMiddleware('/styles.css', (_req: http.IncomingMessage, res: http.ServerResponse)=>{ 
 	(res as any).sendFile('styles.css')
 })
 //prettier-ignore
-server.get('/index.js', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
+server.getMiddleware('/index.js', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
 	(res as any).sendFile('index.js')
 })
 //prettier-ignore
-server.delete('/deletepath', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
+server.deleteMiddleware('/deletepath', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
 	res.end('Hello from deletepath!')
 })
 //prettier-ignore
-server.patch('/patchpath', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
+server.patchMiddleWare('/patchpath', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
 	res.end('Hello from patchpath!')
 })
 

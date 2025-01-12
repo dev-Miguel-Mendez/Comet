@@ -13,12 +13,13 @@ describe('Routes' , ()=>{
         const response = await request(server.server)
         .post('/postpath')
         .expect(200)
+        expect(response.text).toBe('Hello from postpath!')
     })
-    test('/delete path should work', async()=>{
-        const response = await request(server.server)
-        .delete('/deletepath')
-        .expect(200)
-    })
+    // test('/delete path should work', async()=>{
+    //     const response = await request(server.server)
+    //     .delete('/deletepath')
+    //     .expect(200)
+    // })
     test('"sendFile()" should work for index.html', async()=>{
         const response = await request(server.server)
         .get('/')
@@ -59,6 +60,20 @@ describe('Routes' , ()=>{
        .send(buffer)
        .expect(400)
        expect(response.text).toBe("Body is too large!")
+    })
+
+    test('Delete path should work', async()=>{
+        const response = await request(server.server)
+        .delete('/deletepath')
+        .expect(200)
+        expect(response.text).toBe('Hello from deletepath!')
+    })
+
+    test('Patch path should work', async()=>{
+        const response = await request(server.server)
+        .patch('/patchpath')
+        .expect(200)
+        expect(response.text).toBe('Hello from patchpath!')
     })
     
 })
