@@ -2,12 +2,21 @@ import http from "node:http";
 import sendFileFunction from "./utils/sendFile.js";
 import parseBody from "./utils/parseBody.js";
 import saveToFile from "./utils/saveToFile.js";
-
-parseBody;
+//prettier-ignore
+type Middleware = (req: http.IncomingMessage, res: http.ServerResponse, next: Function) => void;
+//prettier-ignore
+type RouteHandler = (req: http.IncomingMessage, res: http.ServerResponse) => void;
 
 class Comet {
 	server: http.Server;
-	routes: { [key: string]: { [key: string]: Function } } = {};
+	routes: {
+		[method: string]: {
+			[path: string]: {
+				middlewares: Middleware[];
+				handler: RouteHandler;
+			};
+		};
+	} = {};
 	staticDir: string = "./public";
 
 	constructor() {
@@ -17,7 +26,6 @@ class Comet {
 			//prettier-ignore
 			const handler: Function = this.routes[method.toUpperCase()]?.[path.toLowerCase()]
 			if (handler) {
-				//$ Here we mess with the prototype of the res object
 				//prettier-ignore
 				(res as any).sendFile = (fileName: string) => {
                     sendFileFunction(fileName, res, this.staticDir);
@@ -41,15 +49,38 @@ class Comet {
 		if (!this.routes.GET) this.routes.GET = {};
 		this.routes.GET[path] = cb;
 	}
+	//prettier-ignore
+	getMiddleware(path: string,...middlewaresAndHandler: (Middleware | RouteHandler)[]) {
+		if (!this.routes.GETMID) this.routes.GETMID = {};
+		const handler = middlewaresAndHandler.pop() as RouteHandler;
+		const middlewares = middlewaresAndHandler as Middleware[];
+		this.routes.GETMID[path] = { middlewares, handler };
+	}
 
 	post(path: string, cb: Function) {
 		if (!this.routes.POST) this.routes.POST = {};
 		this.routes.POST[path] = cb;
 	}
+	//prettier-ignore
+	postMiddleware(path: string, ...middlewaresAndHandler: (Middleware | RouteHandler)[]){
+		if (!this.routes.POST) this.routes.POST = {}
+		const handler = middlewaresAndHandler.pop() as RouteHandler
+		const middlewares = middlewaresAndHandler as Middleware[];
+		this.routes.POST[path] = {middlewares, handler}
+	}
 
 	delete(path: string, cb: Function) {
 		if (!this.routes.DELETE) this.routes.DELETE = {};
 		this.routes.DELETE[path] = cb;
+	}
+	deleteMiddleware(
+		path: string,
+		...middlewaresAndHandler: (Middleware | RouteHandler)[]
+	) {
+		if (!this.routes.DELETE) this.routes.DELETE = {};
+		const handler = middlewaresAndHandler.pop() as RouteHandler;
+		const middlewares = middlewaresAndHandler as Middleware[];
+		this.routes.DELETE[path] = { middlewares, handler };
 	}
 	put(path: string, cb: Function) {
 		if (!this.routes.PUT) this.routes.PUT = {};
@@ -60,13 +91,29 @@ class Comet {
 		this.routes.PATCH[path] = cb;
 	}
 
+	private executeMiddlewares(
+		req: http.IncomingMessage,
+		res: http.ServerResponse,
+		middlewares: Middleware[],
+		finalHandler: Function
+	) {
+		const execute = (index: number)=>{
+			if(index < middlewares.length){
+				middlewares[index](req, res, ()=>{execute(index+1)})
+			} else{
+				finalHandler()
+			}
+		}
+		execute(0)
+	}
+
+	setStaticDir(dirPath: string) {
+		this.staticDir = dirPath + "/";
+	}
 	listen(PORT: number, cb: Function) {
 		this.server.listen(PORT, () => {
 			cb();
 		});
-	}
-	setStaticDir(dirPath: string) {
-		this.staticDir = dirPath + "/";
 	}
 }
 
