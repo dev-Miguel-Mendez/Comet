@@ -6,6 +6,7 @@
 		 "noUnusedParameters": true,
 		 "noFallthroughCasesInSwitch": true,
 		 "noUncheckedSideEffectImports": true,
+		 "sourceMap": true,
 		/* Projects */
 		
 		/* Language and Environment */
