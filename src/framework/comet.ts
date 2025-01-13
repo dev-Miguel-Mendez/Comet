@@ -25,6 +25,7 @@ class Comet {
 	constructor() {
 		//$ USING C L O U S U R E FUNCTIONS
 		this.server = createServer(async (req, res) => {
+			console.log(req.url, req.method)
 			const method = req.method || "GET";
 			const path = req.url || "/";
 			//prettier-ignore
@@ -58,7 +59,7 @@ class Comet {
 	// }
 	//prettier-ignore
 	//$  The three dots mean that the next arguments will be collected into an array.
-	getMiddleware(path: string, ...middlewaresAndHandler: (Middleware | RouteHandler)[]) {
+	get(path: string, ...middlewaresAndHandler: (Middleware | RouteHandler)[]) {
 		if (!this.routes.GET) this.routes.GET = {};
 		const handler = middlewaresAndHandler.pop() as RouteHandler;
 		const middlewares = middlewaresAndHandler as Middleware[];
@@ -66,7 +67,7 @@ class Comet {
 	}
 
 	//prettier-ignore
-	postMiddleware(path: string, ...middlewaresAndHandler: (Middleware | RouteHandler)[]){
+	post(path: string, ...middlewaresAndHandler: (Middleware | RouteHandler)[]){
 		if (!this.routes.POST) this.routes.POST = {}
 		const handler = middlewaresAndHandler.pop() as RouteHandler
 		const middlewares = middlewaresAndHandler as Middleware[];
@@ -74,21 +75,21 @@ class Comet {
 	}
 
 	//prettier-ignore
-	deleteMiddleware(path: string, ...middlewaresAndHandler: (Middleware | RouteHandler)[]) {
+	delete(path: string, ...middlewaresAndHandler: (Middleware | RouteHandler)[]) {
 		if (!this.routes.DELETE) this.routes.DELETE = {};
 		const handler = middlewaresAndHandler.pop() as RouteHandler;
 		const middlewares = middlewaresAndHandler as Middleware[];
 		this.routes.DELETE[path] = { middlewares, handler };
 	}
 	//prettier-ignore
-	putMiddleWare(path: string, ...middlewaresAndHandler: (Middleware | RouteHandler)[]){
+	put(path: string, ...middlewaresAndHandler: (Middleware | RouteHandler)[]){
 		if(!this.routes.PUT) this.routes.PUT = {}
 		const handler = middlewaresAndHandler.pop()  as RouteHandler;
 		const middlewares = middlewaresAndHandler as Middleware[];
 		this.routes.PUT[path] = { middlewares, handler}
 	}
 	//prettier-ignore
-	patchMiddleWare(path: string, ...middlewaresAndHandler: (Middleware | RouteHandler)[]){
+	patch(path: string, ...middlewaresAndHandler: (Middleware | RouteHandler)[]){
 		if(!this.routes.PATCH) this.routes.PATCH = {}
 		const handler = middlewaresAndHandler.pop()  as RouteHandler;
 		const middlewares = middlewaresAndHandler as Middleware[];
@@ -113,14 +114,23 @@ class Comet {
 		execute(0);
 	}
 
+
+
 	setStaticDir(dirPath: string) {
 		this.staticDir = dirPath + "/";
 	}
-	listen(PORT: number, cb: Function) {
+	listen(PORT: number, PORT2: number, cb: Function) {
+		PORT2
 		this.server.listen(PORT, () => {
 			cb();
 		});
+
+		// this.server.listen(PORT2, () => {
+		// 	cb();
+		// });
 	}
 }
 
 export default Comet;
+
+

@@ -75,5 +75,19 @@ describe('Routes' , ()=>{
         .expect(200)
         expect(response.text).toBe('Hello from patchpath!')
     })
-    
+    test('Authentication middleware should work', async()=>{
+        const response = await request(server.server)
+        .get('/authorization')
+        .set("Authorization", "Bearer 12345")
+        .expect(200)
+        expect(response.text).toBe('Completed authorization successfully!')
+    })
+
+    test('Authentication middleware should work for invalid token', async()=>{
+        const response = await request(server.server)
+        .get('/authorization')
+        .set("Authorization", "Bearer 12344")
+        .expect(401)
+        expect(response.text).toBe('Authorization failed!')
+    })
 })

@@ -7,7 +7,8 @@
     "build": "tsc",
     "test": "env-cmd -f ./config/test.env vitest",
     "start": "node dist/user/server-listen.js",
-    "dev1101": "nodemon dist/user/server-listen.js",
+    "dev101": "nodemon dist/user/server-listen.js",
+    "dev102": "nodemon dist/user/proxy.js",
     "debug" : "node inspect dist/user/server-listen.js"
   },
   "keywords": [],

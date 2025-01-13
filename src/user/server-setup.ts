@@ -10,16 +10,40 @@ const server = new Comet();
 
 server.setStaticDir(process.env.DIRNAME || __dirname + "/public");
 
+//* MIDDLEWARE
 //prettier-ignore
-server.getMiddleware('/getpath', async (req: http.IncomingMessage, res: http.ServerResponse)=>{
+const printHi = (_req: http.IncomingMessage, _res: http.ServerResponse, next: Function)=>{
+	console.log('Say  Hi middleware')
+	next()
+}
+//prettier-ignore
+const auth = (req: http.IncomingMessage, res: http.ServerResponse, next: Function)=>{
+	const token = (req.headers.authorization as string).split(' ')[1]
+	if(token === '12345'){
+	next()	
+	} else{
+		res.statusCode = 401
+		res.end('Authorization failed!')
+	}
+}
+
+//* ROUTE HANDLERS
+//prettier-ignore
+server.get('/getpath', printHi, async (req: http.IncomingMessage, res: http.ServerResponse)=>{
 	const body = await (req as any).body()
 	console.log('reqbody:', body) 
+	res.setHeader('lol', 'lol')
+	res.statusCode = 200 // Default
 	res.end('Hello from getpath')
+})
+//prettier-ignore
+server.get('/authorization', auth, (_req: http.IncomingMessage, res: http.ServerResponse)=>{
+	res.end('Completed authorization successfully!')
 })
 
 //! temp:
 //prettier-ignore
-server.postMiddleware('/testparsebody', async(req: http.IncomingMessage, res: http.ServerResponse)=>{
+server.post('/testparsebody', async(req: http.IncomingMessage, res: http.ServerResponse)=>{
 		const body = await (req as any).body()
 		if(!body){
 			res.statusCode = 400
@@ -33,11 +57,11 @@ server.postMiddleware('/testparsebody', async(req: http.IncomingMessage, res: ht
 })
 
 //prettier-ignore
-server.getMiddleware('/', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
+server.get('/', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
 	(res as any).sendFile('index.html')
 })
 //prettier-ignore
-server.getMiddleware('/requestnameimage', (req: http.IncomingMessage, res: http.ServerResponse)=>{
+server.get('/requestnameimage', (req: http.IncomingMessage, res: http.ServerResponse)=>{
 	
 	let message: any
 	req.on('data', (data)=>{
@@ -50,11 +74,11 @@ server.getMiddleware('/requestnameimage', (req: http.IncomingMessage, res: http.
 	})
 })
 //prettier-ignore
-server.postMiddleware('/postpath', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
+server.post('/postpath', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
 	res.end('Hello from postpath!')
 })
 //prettier-ignore
-server.postMiddleware('/upload', (req: http.IncomingMessage, res: http.ServerResponse)=>{
+server.post('/upload', (req: http.IncomingMessage, res: http.ServerResponse)=>{
 	//! I need to implement url parameters here.
 	const writable = fs.createWriteStream(__dirname + '/public/' + req.headers['file-name'])
 	// req.pipe(writable)
@@ -67,7 +91,7 @@ server.postMiddleware('/upload', (req: http.IncomingMessage, res: http.ServerRes
 })
 
 //prettier-ignore
-server.postMiddleware("/upload2", async (req: http.IncomingMessage, res: http.ServerResponse) => {
+server.post("/upload2", async (req: http.IncomingMessage, res: http.ServerResponse) => {
 		const fileName = req.headers['file-name']
 		console.log("File name: ", fileName);
 		const result = await (req as any).saveToFile(fileName, 1e6);
@@ -82,19 +106,19 @@ server.postMiddleware("/upload2", async (req: http.IncomingMessage, res: http.Se
 );
 
 //prettier-ignore
-server.getMiddleware('/styles.css', (_req: http.IncomingMessage, res: http.ServerResponse)=>{ 
+server.get('/styles.css', (_req: http.IncomingMessage, res: http.ServerResponse)=>{ 
 	(res as any).sendFile('styles.css')
 })
 //prettier-ignore
-server.getMiddleware('/index.js', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
+server.get('/index.js', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
 	(res as any).sendFile('index.js')
 })
 //prettier-ignore
-server.deleteMiddleware('/deletepath', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
+server.delete('/deletepath', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
 	res.end('Hello from deletepath!')
 })
 //prettier-ignore
-server.patchMiddleWare('/patchpath', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
+server.patch('/patchpath', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
 	res.end('Hello from patchpath!')
 })
 
