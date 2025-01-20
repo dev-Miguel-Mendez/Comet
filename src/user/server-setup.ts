@@ -4,6 +4,7 @@ import fs from "node:fs";
 
 console.clear();
 
+
 const __dirname = import.meta.dirname;
 
 const server = new Comet();
@@ -18,12 +19,22 @@ const printHi = (_req: http.IncomingMessage, _res: http.ServerResponse, next: Fu
 }
 //prettier-ignore
 const auth = (req: http.IncomingMessage, res: http.ServerResponse, next: Function)=>{
-	const token = (req.headers.authorization as string).split(' ')[1]
-	if(token === '12345'){
-	next()	
+	// const token = (req.headers.authorization as string).split(' ')[1]
+	// if(token === '12345'){
+	// next()	
+	// } else{
+	// 	res.statusCode = 401
+	// 	res.end('Authorization failed!')
+	// }
+	const cookie = req.headers.cookie?.split('=')[1].toString()
+	const verification = server.SESSIONS.find((storedCookie)=>{return storedCookie === cookie})
+	// console.log(cookie)
+	if (verification){
+		next()
 	} else{
 		res.statusCode = 401
-		res.end('Authorization failed!')
+		res.end('cookie verification failed!')
+
 	}
 }
 
@@ -37,8 +48,32 @@ server.get('/getpath', printHi, async (req: http.IncomingMessage, res: http.Serv
 	res.end('Hello from getpath')
 })
 //prettier-ignore
-server.get('/authorization', auth, (_req: http.IncomingMessage, res: http.ServerResponse)=>{
-	res.end('Completed authorization successfully!')
+
+server.get('/login', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
+	const cookie = Math.floor(Math.random()*100000000000).toString()
+	server.SESSIONS.push(cookie) 
+	res.setHeader("Set-Cookie" , [`cookie1=${cookie}; Path=/; HttpOnly`])
+	res.end(`cookie sent: (${cookie})`)
+
+})
+server.get('/checkcookie', (req: http.IncomingMessage, res: http.ServerResponse)=>{
+	console.log(req.headers.cookie)
+	const cookie = req.headers.cookie?.split('=')[1].toString()
+	const verification = server.SESSIONS.find((storedCookie)=>{return storedCookie === cookie})
+	// console.log(cookie)
+	if (verification){
+		res.end('cookie verification succesful!')
+
+	} else{
+		res.statusCode = 401
+		res.end('cookie verification failed!')
+
+	}
+
+})
+
+server.get('/authcookie', auth, (_req: http.IncomingMessage, res: http.ServerResponse)=>{
+	res.end('Completed cookie authorization successfully!')
 })
 
 //! temp:
@@ -107,10 +142,12 @@ server.post("/upload2", async (req: http.IncomingMessage, res: http.ServerRespon
 
 //prettier-ignore
 server.get('/styles.css', (_req: http.IncomingMessage, res: http.ServerResponse)=>{ 
+	// res.statusCode = 200;
 	(res as any).sendFile('styles.css')
 })
 //prettier-ignore
 server.get('/index.js', (_req: http.IncomingMessage, res: http.ServerResponse)=>{
+	
 	(res as any).sendFile('index.js')
 })
 //prettier-ignore
@@ -126,6 +163,9 @@ process.stdin.on("data", (data) => {
 	const str = data.toString().trim();
 	if (str === "R" || str === "r") {
 		console.log(server.routes);
+	}
+	if (str === "S" || str === "s") {
+		console.log(server.SESSIONS);
 	}
 });
 

@@ -5,7 +5,7 @@ import fs from "node:fs";
 import http from "node:http";
 
 //prettier-ignore
-const sendFileFunction = (fileName: string, res: http.ServerResponse, dirPath: string )=>{
+const sendFileFunction = (res: http.ServerResponse, dirPath: string, fileName: string)=>{
     const filePath = dirPath + fileName;
     fs.access(filePath, fs.constants.F_OK | fs.constants.R_OK, (err)=>{
         if(err){

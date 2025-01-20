@@ -21,11 +21,12 @@ class Comet {
 		};
 	} = {};
 	staticDir: string = "./public";
+	SESSIONS: string[] = []
 
 	constructor() {
 		//$ USING C L O U S U R E FUNCTIONS
 		this.server = createServer(async (req, res) => {
-			console.log(req.url, req.method)
+			// console.log(req.url, req.method)
 			const method = req.method || "GET";
 			const path = req.url || "/";
 			//prettier-ignore
@@ -34,7 +35,7 @@ class Comet {
 				//prettier-ignore
 				//$ CLOSURE
 				(res as any).sendFile = (fileName: string) => {
-                    sendFileFunction(fileName, res, this.staticDir);
+                    sendFileFunction(res, this.staticDir, fileName );
                 };
 				//prettier-ignore
 				//$ CLOSURE
@@ -60,10 +61,10 @@ class Comet {
 	//prettier-ignore
 	//$  The three dots mean that the next arguments will be collected into an array.
 	get(path: string, ...middlewaresAndHandler: (Middleware | RouteHandler)[]) {
-		if (!this.routes.GET) this.routes.GET = {};
-		const handler = middlewaresAndHandler.pop() as RouteHandler;
+		if(!this.routes.GET) this.routes.GET = {}
+		const handler = middlewaresAndHandler.pop()	as RouteHandler
 		const middlewares = middlewaresAndHandler as Middleware[];
-		this.routes.GET[path] = { middlewares, handler };
+		this.routes.GET[path] = {middlewares, handler}
 	}
 
 	//prettier-ignore
@@ -105,7 +106,6 @@ class Comet {
 		//prettier-ignore
 		const execute = (index: number)=>{
 			if(index < middlewares.length){
-									      //$ RECURSION ⬇️
 				middlewares[index](req, res, ()=>{execute(index+1)})
 			} else{
 				finalHandler()
@@ -114,23 +114,14 @@ class Comet {
 		execute(0);
 	}
 
-
-
 	setStaticDir(dirPath: string) {
 		this.staticDir = dirPath + "/";
 	}
-	listen(PORT: number, PORT2: number, cb: Function) {
-		PORT2
+	listen(PORT: number, cb: Function) {
 		this.server.listen(PORT, () => {
 			cb();
 		});
-
-		// this.server.listen(PORT2, () => {
-		// 	cb();
-		// });
 	}
 }
 
 export default Comet;
-
-
